@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export const GetDoubt = (subjectFilter) => (dispatch) => {
   dispatch({ type: types.GET_DOUBT_REQUEST });
   return axios
-    .get(`http://localhost:4000/doubt/history?subject=${subjectFilter}`, { withCredentials: true })
+    .get(`https://apirevly.onrender.com/doubt/history?subject=${subjectFilter}`, { withCredentials: true })
     .then((res) => {
       dispatch({ type: types.GET_DOUBT_SUCCESS, payload: res.data.doubts  });
     })
