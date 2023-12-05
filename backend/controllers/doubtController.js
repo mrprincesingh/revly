@@ -5,11 +5,13 @@ const createDoubt = async (req, res) => {
   try {
     const { subject, query, details } = req.body;
     const { userId } = req.user;
-    console.log(userId);
+
+
 
     const student = await User.findById(userId);
     if (!student) {
       return res.status(404).json({ error: 'User not found' });
+
     }
 
     const doubt = new Doubt({
