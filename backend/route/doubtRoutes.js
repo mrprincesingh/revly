@@ -3,7 +3,7 @@ const doubtController = require('../controllers/doubtController');
 const { authenticate,invalidatedTokens  } = require('../utils/authentication');
 const router = express.Router();
 
-router.post('/create', authenticate, doubtController.createDoubt);
+router.post('/create', doubtController.createDoubt);
 router.get('/history', authenticate, doubtController.getDoubtHistory);
 
 router.put('/edit/:doubtId', doubtController.editDoubt);
