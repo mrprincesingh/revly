@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export const SignUpFunc = (payload) => async (dispatch) => {
   try {
     dispatch({ type: REGISTER_REQUEST });
-    const response = await axios.post("http://localhost:4000/auth/register", payload, { withCredentials: true });
+    const response = await axios.post("https://apirevly.onrender.com/auth/register", payload, { withCredentials: true });
 
     dispatch({ type: REGISTER_SUCCESS, payload: response.data });
     toast.success('Registration successful!', { position: toast.POSITION.TOP_CENTER });
@@ -29,7 +29,7 @@ export const Loginfunction = (data1) => (dispatch) => {
   dispatch({ type: LOGIN_REQUEST });
 
   axios
-    .post("http://localhost:4000/auth/login", data1, { withCredentials: true })
+    .post("https://apirevly.onrender.com/auth/login", data1, { withCredentials: true })
     .then((response) => {
       dispatch({ type: LOGIN_SUCCESS, payload: response.data });
       toast.success('Login successful!', { position: toast.POSITION.TOP_CENTER });

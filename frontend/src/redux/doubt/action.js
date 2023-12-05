@@ -19,7 +19,7 @@ export const GetDoubt = (subjectFilter) => (dispatch) => {
 export const PostDoubt = (payload) => async (dispatch) => {
     try {
       dispatch({ type: types.POST_DOUBT_REQUEST });
-      const response = await axios.post("http://localhost:4000/doubt/create", payload, { withCredentials: true });
+      const response = await axios.post("https://apirevly.onrender.com/doubt/create", payload, { withCredentials: true });
   
       dispatch({ type: types.POST_DOUBT_SUCCESS, payload: response.data });
       toast.success('Doubt Successfully Posted ', { position: toast.POSITION.TOP_CENTER });
@@ -42,7 +42,7 @@ export const PostDoubt = (payload) => async (dispatch) => {
     dispatch({ type: types.DELETE_DOUBT_REQUEST });
   
     return axios
-      .delete(`http://localhost:4000/doubt/delete/${id}`)
+      .delete(`https://apirevly.onrender.com/doubt/delete/${id}`)
       .then((res) => {
         dispatch({ type: types.DELETE_DOUBT_SUCCESS, payload: res.data });
         toast.success('Doubt Successfully Deleted', { position: toast.POSITION.TOP_CENTER });
@@ -58,7 +58,7 @@ export const PostDoubt = (payload) => async (dispatch) => {
   export const editDoubt = (id, payload) => (dispatch) => {
     dispatch({ type: types.EDIT_DOUBT_REQUEST });
     return axios
-      .put(`http://localhost:4000/doubt/edit/${id}`, payload)
+      .put(`https://apirevly.onrender.com/doubt/edit/${id}`, payload)
       .then((r) => {
         dispatch({ type: types.EDIT_DOUBT_SUCCESS, payload: r.data });
         toast.success('Doubt Successfully Edited', { position: toast.POSITION.TOP_CENTER });
