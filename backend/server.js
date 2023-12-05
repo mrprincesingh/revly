@@ -12,7 +12,7 @@ const app = express();
 
 // Middleware
 app.use(cookieParser());
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: 'https://revly-azure.vercel.app/', credentials: true }));
 app.use(express.json());
 
 // Database connection
