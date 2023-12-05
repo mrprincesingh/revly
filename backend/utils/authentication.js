@@ -1,30 +1,29 @@
-const jwt = require('jsonwebtoken');
+// authentication.js
 
-const invalidatedTokens = [];
-const authenticate = (req, res, next) => {
-  const token = req.cookies.token;
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
-  if (!token) {
-    return res.status(401).json({ error: 'No token, authorization denied' });
-  }
-
+const authenticate = async (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    console.log('Decoded User:', decoded);
-    next();
-  } catch (error) {
-    console.error('Token Verification Failed:', error);
+    const { token } = req.cookies;
 
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token has expired' });
+    if (!token) {
+      return res.status(401).json({ error: 'Not Logged in' });
     }
 
-    return res.status(401).json({ error: 'Token is not valid' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.userId);
+
+    if (!req.user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    next();
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
-
-
-module.exports = { authenticate, invalidatedTokens };
+export { authenticate };
 

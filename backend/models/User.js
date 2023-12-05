@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -28,7 +29,6 @@ const userSchema = new mongoose.Schema({
   language: {
     type: String,
     required: true,
-    
   },
   specialized: {
     type: String,
@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema({
   ],
 });
 
+userSchema.methods.getJWTToken = function () {
+  return jwt.sign({ userId: this._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
+};
+
 const User = mongoose.model('User', userSchema);
 
-module.exports = User;
+export default User;

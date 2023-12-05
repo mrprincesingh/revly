@@ -1,21 +1,23 @@
-const Doubt = require('../models/Doubt');
-const User = require('../models/User');
 
-const createDoubt = async (req, res) => {
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
+import Doubt from '../models/Doubt.js'; // Assuming you have the Doubt model imported
+import { catchAsyncError } from '../utils/catchAsyncError.js';
+import ErrorHandler from '../utils/errorHandler.js';
+const createDoubt = catchAsyncError(async (req, res, next) => {
   try {
     const { subject, query, details } = req.body;
-    const { userId } = req.user;
-
-
-
-    const student = await User.findById(userId);
+    const { _id } = req.user;
+    console.log('userId:', _id);
+    console.log('req.user:', req.user);
+    const student = await User.findById(_id);
+    console.log('Student:', student);
     if (!student) {
-      return res.status(404).json({ error: 'User not found' });
-
+      return next(new ErrorHandler('User not found', 404));
     }
 
     const doubt = new Doubt({
-      student: userId,
+      student: _id,
       subject,
       query,
       details,
@@ -32,33 +34,34 @@ const createDoubt = async (req, res) => {
     const tutors = await User.find({ role: 'tutor', specialized: subject });
 
     // Associate the doubt with each tutor by pushing its _id to the doubts array
-    tutors.forEach(async (tutor) => {
+    for (const tutor of tutors) {
       tutor.doubts.push(doubt._id);
       await tutor.save();
-    });
+    }
 
     res.status(201).json({ message: 'Doubt created successfully', doubt });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    next(new ErrorHandler('Internal Server Error', 500));
   }
-};
+});
+
 
 const getDoubtHistory = async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { _id } = req.user;
     const { subject } = req.query;
 
     let user;
 
     if (subject) {
-      user = await User.findById(userId).populate({
+      user = await User.findById(_id).populate({
         path: 'doubts',
         match: { subject },
         options: { sort: { createdAt: -1 } },
       });
     } else {
-      user = await User.findById(userId).populate({ path: 'doubts', options: { sort: { createdAt: -1 } } });
+      user = await User.findById(_id).populate({ path: 'doubts', options: { sort: { createdAt: -1 } } });
     }
 
     if (!user) {
@@ -107,26 +110,25 @@ const deleteDoubt = async (req, res) => {
     // Remove the doubt from the associated student's doubts array
     const student = await User.findById(doubt.student);
     if (student) {
-      student.doubts = student.doubts.filter((doubt) => doubt.toString() !== doubtId);
+      student.doubts = student.doubts.filter((d) => d.toString() !== doubtId);
       await student.save();
     }
 
     // Remove the doubt from the associated tutor(s)' doubts array
     const tutors = await User.find({ role: 'tutor', specialized: doubt.subject });
-    tutors.forEach(async (tutor) => {
-      tutor.doubts = tutor.doubts.filter((doubt) => doubt.toString() !== doubtId);
+    for (const tutor of tutors) {
+      tutor.doubts = tutor.doubts.filter((d) => d.toString() !== doubtId);
       await tutor.save();
-    });
+    }
 
     // Remove the doubt from the Doubt collection
     await Doubt.findByIdAndDelete(doubtId);
 
     res.status(200).json({ message: 'Doubt deleted successfully' });
-    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
-module.exports = { createDoubt, getDoubtHistory, editDoubt, deleteDoubt };
+export { createDoubt, getDoubtHistory, editDoubt, deleteDoubt };
